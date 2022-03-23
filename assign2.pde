@@ -125,7 +125,7 @@ void draw() {
       leftPressed = false;
       rightPressed = false;
     }
-    myCount++;
+
     if (upPressed) {
       image(groundhogIdle, ghX, ghY, 80, 80);
       ghY -= ghSpeed/15.0;
@@ -140,12 +140,9 @@ void draw() {
       ghX += ghSpeed/15.0;
     } else { 
       image(groundhogIdle, ghX, ghY, 80, 80);
-      myCount = 0;
+  
     }
 
-    if (myCount == 15) {    
-      myCount = 0;
-    }
 
 
     break;
@@ -186,7 +183,6 @@ void draw() {
 
 void keyPressed() { 
   if (key == CODED) {
-    myCount = 0 ;
     switch (keyCode) {
     case UP:
       upPressed = true;
