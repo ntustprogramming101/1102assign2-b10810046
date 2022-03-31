@@ -24,16 +24,22 @@ final int BUTTON_BOTTOM = 280;
 final int BUTTON_LEFT = 115;
 final int BUTTON_RIGHT = 450;
 
-//用來偵測移動用的設定
-boolean upPressed = false;
-boolean downPressed = false;
-boolean leftPressed = false;
-boolean rightPressed = false;
+
 //土撥鼠移動速度
-float ghSpeed = 80;
+float ghSpeed = 80.0;
 //記數
 int myCount = 0;
+//出現吧 土撥鼠
+int ghgood =1;
+final int down = 2;
+final int right = 3;
+final int left = 4; 
+final int idle = 5;
+//計時
+int time;
+
 void setup() {
+
   size(640, 480, P2D);
   //圖片資料加載
   bg = loadImage("img/bg.jpg");
@@ -57,10 +63,10 @@ void setup() {
   //士兵xy
   soldierX = 0;
   soldierY = gridSize*floor(random(3, 6));
+  ghgood = idle;
 }
 
 void draw() {
-  //frameRate(60);
 
   switch(gameState) {
   case GAME_START:
@@ -74,6 +80,9 @@ void draw() {
         gameState = GAME_RUN;
       }
     }
+    //土撥鼠xy
+    ghX = 4*gridSize;
+    ghY = 1*gridSize;
     break;
 
   case GAME_RUN:
@@ -120,31 +129,60 @@ void draw() {
       ghLife -=1;
       ghX = 4*gridSize;
       ghY = 1*gridSize;
-      upPressed = false;
-      downPressed = false;
-      leftPressed = false;
-      rightPressed = false;
+      time = 15;
     }
+    //keyPressed控制ghstate
 
-    if (upPressed) {
-      image(groundhogIdle, ghX, ghY, 80, 80);
-      ghY -= ghSpeed/15.0;
-    } else if (downPressed) {
-      image(groundhogDown, ghX, ghY, 80, 80);
-      ghY += ghSpeed/15.0;
-    } else if (leftPressed) {
-      image(groundhogLeft, ghX, ghY, 80, 80);
-      ghX -= ghSpeed/15.0;
-    } else if (rightPressed) {
-      image(groundhogRight, ghX, ghY, 80, 80);
-      ghX += ghSpeed/15.0;
+    if (time < 15) {
+      switch (ghgood) {
+      case down:
+        time++;
+        image(groundhogDown, ghX, ghY, 80, 80);
+        ghY += ghSpeed/15.0+1;
+        if (time ==15) {
+          ghgood = idle;
+        }
+        break;
+      case right:
+        time++;
+        image(groundhogRight, ghX, ghY, 80, 80);
+        ghX += ghSpeed/15.0+1;
+        if (time ==15) {
+          ghgood = idle;
+        }
+        break;
+      case left:
+        time++;
+        image(groundhogLeft, ghX, ghY, 80, 80);
+        ghX -= ghSpeed/15.0+1;
+        if (time ==15) {
+          ghgood = idle;
+        }
+        break;
+      case idle:
+        image(groundhogIdle, ghX, ghY, 80, 80);
+        break;
+      }
     } else { 
       image(groundhogIdle, ghX, ghY, 80, 80);
-  
     }
-
-
-
+    if (time ==15) {
+      ghX = round(ghX/80.0)*80;
+      ghY = round(ghY/80.0)*80;
+    }
+    //讓土撥鼠不要超出邊界的設定
+    if (ghX > width-80) {
+      ghX = width-80;
+    }
+    if (ghX < 0) {
+      ghX = 0;
+    }
+    if (ghY < 80) {
+      ghY = 80;
+    }
+    if (ghY > height-80) {
+      ghY = height-80;
+    }
     break;
 
   case GAME_LOSE:
@@ -166,77 +204,24 @@ void draw() {
     }
     break;
   }
-  //讓土撥鼠不要超出邊界的設定
-  if (ghX > width-80) {
-    ghX = width-80;
-  }
-  if (ghX < 0) {
-    ghX = 0;
-  }
-  if (ghY < 80) {
-    ghY = 80;
-  }
-  if (ghY > height-80) {
-    ghY = height-80;
-  }
 }
 
-void keyPressed() { 
+void keyPressed () {
   if (key == CODED) {
-    switch (keyCode) {
-    case UP:
-      upPressed = true;
-      //  ghV = GH1;
+    switch(keyCode) {
+    case DOWN :
+      time = 0;
+      ghgood = down;
+      break;
 
-      break;
-    case DOWN:
-      downPressed = true;
-      // ghV = GH2;
-      break;
     case LEFT:
-      leftPressed = true;
-      //  ghV = GH3;
+      time = 0;
+      ghgood = left;
       break;
+
     case RIGHT:
-      rightPressed = true;
-      //  ghV = GH4;
-      break;
-    }
-  }
-}
-
-void keyReleased() { 
-  if (key == CODED) {
-    switch (keyCode) {
-    case UP:
-      upPressed = false;
-      if (ghY > floor(ghY/gridSize)*gridSize) {
-        ghY -= ghSpeed/15.0;
-      }
-      ghY = floor(ghY/gridSize)*gridSize;
-      break;
-    case DOWN:
-      downPressed = false;
-      if (ghY < floor(ghY/gridSize)*gridSize) {
-        ghY += ghSpeed/15.0;
-      }
-      ghY = (floor(ghY/gridSize)+1)*gridSize;
-      break;
-    case LEFT:
-      leftPressed = false;
-      if (ghX > floor(ghX/gridSize)*gridSize) {
-        ghX -= ghSpeed/15.0;
-      }
-      ghX = floor(ghX/gridSize)*gridSize;
-
-      break;
-    case RIGHT:
-      rightPressed = false;
-      if (ghX < floor(ghX/gridSize)*gridSize) {
-        ghX -= ghSpeed/15.0;
-      }
-      ghX = (floor(ghX/gridSize)+1)*gridSize;
-
+      time = 0;
+      ghgood = right;
       break;
     }
   }
